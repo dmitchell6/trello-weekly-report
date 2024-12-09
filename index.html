@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weekly Report Power-Up</title>
+<link rel="stylesheet" href="styles.css" />
+<script src="https://p.trellocdn.com/power-up.min.js"></script>
+<script src="client.js" defer></script>
+<style>
+.loading-spinner {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Weekly Report</h1>
+  <p>Select a start and end date (Sundays recommended) and then generate your report.</p>
+  <label>Start Date: <input type="date" id="start-date"></label>
+  <label>End Date: <input type="date" id="end-date"></label>
+  <button id="generate-btn">Generate Report</button>
+
+  <div id="report-container" style="display:none;">
+    <h2>Tasks</h2>
+    <table id="report-table">
+      <thead>
+        <tr>
+          <th>Task Name</th>
+          <th>Labels</th>
+          <th>Completed By</th>
+          <th>Completion Date</th>
+          <th>Status</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button id="send-email-btn">Send Report via Email</button>
+  </div>
+
+  <div class="loading-spinner" style="display:none;">
+    <div class="spinner"></div>
+    <p>Generating report...</p>
+  </div>
+
+  <div class="error-message" style="display:none;">
+    <p class="error-text"></p>
+  </div>
+</div>
+</body>
+</html>

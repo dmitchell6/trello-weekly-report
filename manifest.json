@@ -1,0 +1,33 @@
+{
+  "title": "Weekly Report Power-Up",
+  "capabilities": {
+    "board-buttons": [
+      {
+        "text": "Weekly Report",
+        "icon": {
+          "dark": "/images/icon-dark.svg",
+          "light": "/images/icon-light.svg"
+        },
+        "callback": "boardButtonCallback"
+      }
+    ],
+    "authorization-status": {
+      "url": "./auth-status.html"
+    }
+  },
+  "connectors": {},
+  "iframe": {
+    "url": "https://YOUR-DOMAIN/index.html",
+    "displayName": "Weekly Report",
+    "icon": "https://YOUR-DOMAIN/icon.png",
+    "allowedDomains": [
+      "https://YOUR-DOMAIN"
+    ]
+  },
+  "authorization": {
+    "polling": {
+      "enabled": true
+    }
+  },
+  "name": "Weekly Report Power-Up"
+}

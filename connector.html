@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Trello Weekly Report Power-Up</title>
+</head>
+<body>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+        window.TrelloPowerUp.initialize({
+            'board-buttons': function(t, options) {
+                return [{
+                    icon: {
+                        dark: '/images/icon-dark.svg',
+                        light: '/images/icon-light.svg'
+                    },
+                    text: 'Weekly Report',
+                    callback: function(t) {
+                        return t.modal({
+                            url: './index.html',
+                            height: 600,
+                            title: 'Weekly Report'
+                        });
+                    }
+                }];
+            }
+        });
+    </script>
+</body>
+</html> 
