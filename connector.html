@@ -11,18 +11,31 @@
             'board-buttons': function(t, options) {
                 return [{
                     icon: {
-                        dark: '/images/icon-dark.svg',
-                        light: '/images/icon-light.svg'
+                        dark: 'https://dmitchell6.github.io/trello-weekly-report/images/icon-dark.svg',
+                        light: 'https://dmitchell6.github.io/trello-weekly-report/images/icon-light.svg'
                     },
                     text: 'Weekly Report',
                     callback: function(t) {
                         return t.modal({
-                            url: './index.html',
+                            url: 'https://dmitchell6.github.io/trello-weekly-report/index.html',
                             height: 600,
                             title: 'Weekly Report'
                         });
                     }
                 }];
+            },
+            'authorization-status': function(t, options) {
+                return t.get('member', 'private', 'token')
+                    .then(function(token) {
+                        return { authorized: token != null };
+                    });
+            },
+            'show-authorization': function(t, options) {
+                return t.popup({
+                    title: 'Authorize Weekly Report',
+                    url: 'https://dmitchell6.github.io/trello-weekly-report/auth.html',
+                    height: 140
+                });
             }
         });
     </script>
