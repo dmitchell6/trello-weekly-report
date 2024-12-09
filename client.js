@@ -6,23 +6,32 @@ const t = window.TrelloPowerUp.iframe();
 let TRELLO_API_KEY;
 let TRELLO_TOKEN;
 
-// Get API credentials when iframe is ready
-t.get('member', 'private', 'appKey')
-  .then(key => {
-    TRELLO_API_KEY = key;
-    console.log('API Key loaded:', TRELLO_API_KEY);
-    return t.get('member', 'private', 'token');
-  })
-  .then(token => {
-    TRELLO_TOKEN = token;
-    console.log('Token loaded:', TRELLO_TOKEN);
-    // Now that we have the credentials, test the connection
-    return testConnection();
-  })
-  .catch(error => {
-    console.error('Failed to load API credentials:', error);
-    showError('Failed to load API credentials');
+// Authorize with Trello
+t.authorize('https://api.trello.com', {
+  type: 'popup',
+  name: 'Weekly Report Power-Up',
+  scope: {
+    read: 'true',
+    write: 'true'
+  },
+  expiration: 'never'
+})
+.then(token => {
+  TRELLO_TOKEN = token;
+  return t.arg('appKey');
+})
+.then(key => {
+  TRELLO_API_KEY = key;
+  console.log('Credentials loaded:', { 
+    apiKey: TRELLO_API_KEY, 
+    token: TRELLO_TOKEN 
   });
+  return testConnection();
+})
+.catch(error => {
+  console.error('Authorization failed:', error);
+  showError('Failed to authorize with Trello');
+});
 
 // Rate limiter for API calls
 const rateLimiter = {
