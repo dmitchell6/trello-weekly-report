@@ -3,8 +3,8 @@
 const t = window.TrelloPowerUp.iframe();
 
 // Get API key from Trello's Power-Up framework
-const TRELLO_API_KEY = window.TrelloPowerUp.iframe().arg('appKey');
-const TRELLO_TOKEN = window.TrelloPowerUp.iframe().arg('token');
+const TRELLO_API_KEY = 'a8ca9d3c762c754cff0654ff37cce663';
+const TRELLO_TOKEN = 'ATTAc16b0c97a5bfeda486f3f57868e68656f680b60bbe67d7800759379d7082bde4EBF1783B';
 
 // Rate limiter for API calls
 const rateLimiter = {
