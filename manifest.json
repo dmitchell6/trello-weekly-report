@@ -17,8 +17,9 @@
   },
   "connectors": {},
   "iframe": {
-    "url": "http://localhost:8000/frontend/index.html",
+    "url": "https://dmitchell6.github.io/trello-weekly-report/frontend/index.html",
     "displayName": "Weekly Report",
+    "icon": "https://dmitchell6.github.io/trello-weekly-report/images/icon.png",
     "icon": "https://dmitchell6.github.io/trello-weekly-report/icon.png",
     "allowedDomains": [
       "https://dmitchell6.github.io",
