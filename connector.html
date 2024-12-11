@@ -3,23 +3,24 @@
 <head>
     <meta charset="utf-8">
     <title>Trello Weekly Report Power-Up</title>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script src="config.js"></script>
 </head>
 <body>
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
         window.TrelloPowerUp.initialize({
             'board-buttons': function(t, options) {
                 return [{
                     icon: {
-                        dark: 'https://dmitchell6.github.io/trello-weekly-report/images/icon-dark.svg',
-                        light: 'https://dmitchell6.github.io/trello-weekly-report/images/icon-light.svg'
+                        dark: '/images/icon-dark.svg',
+                        light: '/images/icon-light.svg'
                     },
                     text: 'Weekly Report',
                     callback: function(t) {
                         return t.modal({
-                            url: 'https://dmitchell6.github.io/trello-weekly-report/index.html',
-                            height: 600,
-                            title: 'Weekly Report'
+                            url: './index.html',
+                            title: 'Weekly Report',
+                            height: 600
                         });
                     }
                 }];
@@ -33,7 +34,7 @@
             'show-authorization': function(t, options) {
                 return t.popup({
                     title: 'Authorize Weekly Report',
-                    url: 'https://dmitchell6.github.io/trello-weekly-report/auth.html',
+                    url: 'http://192.168.6.124:8000/auth-success.html',  <!-- Updated to your existing file -->
                     height: 140
                 });
             }

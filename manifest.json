@@ -5,24 +5,23 @@
       {
         "text": "Weekly Report",
         "icon": {
-          "dark": "https://dmitchell6.github.io/trello-weekly-report/images/icon-dark.svg",
-          "light": "https://dmitchell6.github.io/trello-weekly-report/images/icon-light.svg"
+          "dark": "http://192.168.6.124:8000/images/icon-dark.svg",
+          "light": "http://192.168.6.124:8000/images/icon-light.svg"
         },
         "callback": "boardButtonCallback"
       }
     ],
     "authorization-status": {
-      "url": "https://dmitchell6.github.io/trello-weekly-report/auth-status.html"
+      "url": "http://192.168.6.124:8000/auth-success.html"
     }
   },
   "connectors": {},
   "iframe": {
-    "url": "https://dmitchell6.github.io/trello-weekly-report/frontend/index.html",
+    "url": "http://192.168.6.124:8000/frontend/index.html",
     "displayName": "Weekly Report",
-    "icon": "https://dmitchell6.github.io/trello-weekly-report/images/icon.png",
-    "icon": "https://dmitchell6.github.io/trello-weekly-report/icon.png",
+    "icon": "http://192.168.6.124:8000/icon.png",
     "allowedDomains": [
-      "https://dmitchell6.github.io",
+      "http://192.168.6.124:8000",
       "http://localhost:8000",
       "https://trello.com",
       "https://api.trello.com"
@@ -37,6 +36,7 @@
   "cors": {
     "enabled": true,
     "origins": [
+      "http://192.168.6.124:8000",
       "http://localhost:8000",
       "https://trello.com",
       "https://api.trello.com"

@@ -36,8 +36,8 @@
                         throw new Error('No token received from Trello');
                     }
 
-                    // Store the token
-                    return t.arg('token', signed.token);
+                    // Store the token using t.set
+                    return t.set('member', 'private', 'token', signed.token);
                 })
                 .then(function() {
                     showMessage('Authorization successful! Closing window...');
@@ -46,7 +46,8 @@
                     }, 1000);
                 })
                 .catch(function(error) {
-                    throw new Error('Failed to process token: ' + error.message);
+                    console.error('Failed to process token:', error);
+                    showMessage('Authorization failed: ' + error.message, true);
                 });
             
         } catch (error) {

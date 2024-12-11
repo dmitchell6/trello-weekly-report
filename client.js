@@ -8,37 +8,43 @@ function debug(...args) {
   }
 }
 
-const t = window.TrelloPowerUp.iframe();
-
-// Initialize API credentials
-let TRELLO_API_KEY = 'a8ca9d3c762c754cff0654ff37cce663'; // Get this from https://trello.com/app-key
+// Remove hardcoded credentials
+const TRELLO_API_KEY = window.TrelloConfig?.apiKey;
+const TRELLO_SECRET = window.TrelloConfig?.secret;
 let TRELLO_TOKEN;
 
-// Authorize with Trello
-t.authorize('https://api.trello.com', {
-  type: 'popup',
-  name: 'Weekly Report Power-Up',
-  scope: {
-    read: 'true',
-    write: 'true'
-  },
-  expiration: 'never'
-})
-.then(token => {
-  TRELLO_TOKEN = token;
-  return t.arg('appKey');
-})
-.then(key => {
-  TRELLO_API_KEY = key;
-  console.log('Credentials loaded:', { 
-    apiKey: TRELLO_API_KEY, 
-    token: TRELLO_TOKEN 
+// Initialize the iframe
+const t = window.TrelloPowerUp.iframe({
+  secret: TRELLO_SECRET
+});
+
+console.log('Iframe initialized successfully');
+
+// Wait for DOM content to be loaded before setting up event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize event listeners
+  const generateBtn = document.getElementById('generate-btn');
+  const sendEmailBtn = document.getElementById('send-email-btn');
+
+  if (generateBtn) {
+    generateBtn.addEventListener('click', generateReport);
+  }
+
+  if (sendEmailBtn) {
+    sendEmailBtn.addEventListener('click', sendEmailReport);
+  }
+
+  // Test connection after DOM is loaded
+  testConnection().then((isConnected) => {
+    if (isConnected) {
+      console.log('Ready to use Trello API');
+    } else {
+      console.error('Failed to connect to Trello API');
+    }
+  }).catch(error => {
+    console.error('Failed to initialize:', error);
+    showError('Failed to initialize Trello Power-Up');
   });
-  return testConnection();
-})
-.catch(error => {
-  console.error('Authorization failed:', error);
-  showError('Failed to authorize with Trello');
 });
 
 // Rate limiter for API calls
@@ -68,7 +74,7 @@ window.TrelloPowerUp.Promise.all = async function(...args) {
   return result;
 };
 
-// Add this near the top of your file
+// CORS Headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -106,20 +112,14 @@ async function trelloGet(endpoint) {
   }
 }
 
-// Existing event listeners and functions
-document.getElementById('generate-btn').addEventListener('click', generateReport);
-document.getElementById('send-email-btn').addEventListener('click', sendEmailReport);
-
 async function authorize() {
   try {
     // Check for existing token
-    let token = await t.arg('token');
+    let token = await t.get('member', 'private', 'token');
     
+    // If no token exists, try to authorize
     if (!token) {
-      // Create a signed return URL
-      const returnUrl = await t.signUrl('https://dmitchell6.github.io/trello-weekly-report/auth-success.html');
-      
-      // Request new token if none exists
+      console.log('No existing token found, attempting authorization...');
       token = await t.authorize({
         type: 'popup',
         name: 'Weekly Report Power-Up',
@@ -129,7 +129,8 @@ async function authorize() {
           account: true
         },
         expiration: 'never',
-        return_url: returnUrl  // Use the signed URL here
+        // Use the signed URL here
+        return_url: await t.signUrl('http://192.168.6.124:8000/auth-success.html')  // Ensure this matches your setup
       });
       
       // Store token for future use
@@ -180,109 +181,76 @@ async function generateReport() {
     // Populate the report table
     populateReportTable(doneCards, doingCards, startDate, endDate);
 
-    // Show the report container
+    // Hide loading spinner and show report
+    showLoading(false);
     document.getElementById('report-container').style.display = 'block';
-
   } catch (error) {
     console.error('Error generating report:', error);
     showError(error.message);
-  } finally {
     showLoading(false);
   }
 }
 
-function populateReportTable(doneCards, doingCards, startDate, endDate) {
-  const tbody = document.querySelector('#report-table tbody');
-  tbody.innerHTML = ''; // Clear existing rows
-
-  const allCards = [...doneCards, ...doingCards];
-
-  allCards.forEach(card => {
-    const tr = document.createElement('tr');
-
-    // Task Name
-    const nameTd = document.createElement('td');
-    nameTd.textContent = card.name;
-    tr.appendChild(nameTd);
-
-    // Labels
-    const labelsTd = document.createElement('td');
-    labelsTd.textContent = card.labels.map(label => label.name).join(', ');
-    tr.appendChild(labelsTd);
-
-    // Completed By (Assuming 'memberCreator' has the info)
-    const completedByTd = document.createElement('td');
-    completedByTd.textContent = card.memberCreator ? card.memberCreator.fullName : 'N/A';
-    tr.appendChild(completedByTd);
-
-    // Completion Date
-    const completionDateTd = document.createElement('td');
-    completionDateTd.textContent = card.due ? new Date(card.due).toLocaleDateString() : 'N/A';
-    tr.appendChild(completionDateTd);
-
-    // Status
-    const statusTd = document.createElement('td');
-    statusTd.textContent = card.closed ? 'Done' : 'Doing';
-    tr.appendChild(statusTd);
-
-    // URL
-    const urlTd = document.createElement('td');
-    const urlLink = document.createElement('a');
-    urlLink.href = card.shortUrl;
-    urlLink.textContent = 'View';
-    urlLink.target = '_blank';
-    urlTd.appendChild(urlLink);
-    tr.appendChild(urlTd);
-
-    tbody.appendChild(tr);
-  });
-
-  // Enable Send Email button if there are tasks
-  const sendEmailBtn = document.getElementById('send-email-btn');
-  sendEmailBtn.disabled = allCards.length === 0;
-}
-
 async function sendEmailReport() {
-  const tableHTML = document.getElementById('report-table').outerHTML;
-  const startDate = document.getElementById('start-date').value;
-  const endDate = document.getElementById('end-date').value;
+  try {
+    const tableHTML = document.getElementById('report-table').outerHTML;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
 
-  const reportHTML = `
-  <html>
-    <body>
-      <h2>Weekly Trello Report</h2>
-      <p><strong>Reporting Period:</strong> ${startDate} to ${endDate}</p>
-      ${tableHTML}
-    </body>
-  </html>
-  `;
+    const reportHTML = `
+    <html>
+      <body>
+        <h2>Weekly Trello Report</h2>
+        <p><strong>Reporting Period:</strong> ${startDate} to ${endDate}</p>
+        ${tableHTML}
+      </body>
+    </html>
+    `;
 
-  // Replace YOUR_API_GATEWAY_URL with your actual API Gateway endpoint
-  const response = await fetch('YOUR_API_GATEWAY_URL/sendEmail', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ html: reportHTML })
-  });
+    // Replace YOUR_API_GATEWAY_URL with your actual API Gateway endpoint
+    const response = await fetch('YOUR_API_GATEWAY_URL/sendEmail', {  // Update to your API URL
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ html: reportHTML })
+    });
 
-  if (response.ok) {
-    alert('Email sent successfully!');
-  } else {
-    alert('Failed to send email.');
+    if (response.ok) {
+      alert('Email sent successfully!');
+    } else {
+      alert('Failed to send email.');
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    alert('An error occurred while sending the email.');
   }
 }
 
 // Updated testConnection function
 async function testConnection() {
   try {
-    console.log('Testing connection with API Key:', TRELLO_API_KEY);
-    console.log('Testing connection with Token:', TRELLO_TOKEN);
+    // First try to get an existing token
+    let token = await t.get('member', 'private', 'token');
     
-    if (!TRELLO_API_KEY || !TRELLO_TOKEN) {
+    // If no token exists, try to authorize
+    if (!token) {
+      console.log('No existing token found, attempting authorization...');
+      try {
+        token = await authorize();
+      } catch (authError) {
+        console.error('Authorization attempt failed:', authError);
+        throw new Error('Failed to obtain authorization token');
+      }
+    }
+
+    console.log('Testing connection with API Key:', TRELLO_API_KEY);
+    console.log('Testing connection with Token:', token);
+    
+    if (!TRELLO_API_KEY || !token) {
       throw new Error('API credentials are not properly configured');
     }
     
     const response = await fetch(
-      `https://api.trello.com/1/members/me/boards?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
+      `https://api.trello.com/1/members/me/boards?key=${TRELLO_API_KEY}&token=${token}`
     );
     
     if (!response.ok) {
@@ -299,16 +267,6 @@ async function testConnection() {
   }
 }
 
-// Call it when the page loads
-window.addEventListener('load', async () => {
-  const isConnected = await testConnection();
-  if (isConnected) {
-    console.log('Ready to use Trello API');
-  } else {
-    console.error('Failed to connect to Trello API');
-  }
-});
-
 // Helper functions
 function showError(message) {
   const errorDiv = document.querySelector('.error-message');
@@ -324,29 +282,55 @@ function showLoading(show) {
   document.querySelector('.loading-spinner').style.display = show ? 'block' : 'none';
 }
 
-window.TrelloPowerUp.initialize({
-    'board-buttons': function(t, options) {
-      return [{
-        icon: {
-          dark: '/images/icon-dark.svg',
-          light: '/images/icon-light.svg'
-        },
-        text: 'Weekly Report',
-        callback: function(t) {
-          return t.modal({
-            url: './index.html',
-            title: 'Weekly Report',
-            height: 600
-          });
-        }
-      }];
-    }
+function populateReportTable(doneCards, doingCards, startDate, endDate) {
+  const tbody = document.querySelector('#report-table tbody');
+  tbody.innerHTML = ''; // Clear existing rows
+
+  const allCards = [...doneCards, ...doingCards];
+
+  allCards.forEach(card => {
+    const tr = document.createElement('tr');
+
+    const taskName = document.createElement('td');
+    taskName.textContent = card.name;
+    tr.appendChild(taskName);
+
+    const labels = document.createElement('td');
+    labels.textContent = card.labels.map(label => label.name).join(', ');
+    tr.appendChild(labels);
+
+    const completedBy = document.createElement('td');
+    completedBy.textContent = card.idMembers.map(memberId => {
+      const member = window.TrelloPowerUp.iframe().getContext().members.find(m => m.id === memberId);
+      return member ? member.fullName : 'Unknown';
+    }).join(', ');
+    tr.appendChild(completedBy);
+
+    const completionDate = document.createElement('td');
+    const date = new Date(card.dateLastActivity);
+    completionDate.textContent = date.toLocaleDateString();
+    tr.appendChild(completionDate);
+
+    const status = document.createElement('td');
+    status.textContent = doneCards.includes(card) ? 'Done' : 'Doing';
+    tr.appendChild(status);
+
+    const url = document.createElement('td');
+    const link = document.createElement('a');
+    link.href = card.url;
+    link.textContent = 'View Card';
+    link.target = '_blank';
+    url.appendChild(link);
+    tr.appendChild(url);
+
+    tbody.appendChild(tr);
   });
 
-if (DEBUG) {
-  window.TrelloPowerUp.iframe({
-    show: function() {
-      debug('Power-Up iframe shown');
-    }
-  });
+  // Enable Send Email button if there are tasks
+  const sendEmailBtn = document.getElementById('send-email-btn');
+  if (allCards.length > 0) {
+    sendEmailBtn.disabled = false;
+  } else {
+    sendEmailBtn.disabled = true;
+  }
 }
