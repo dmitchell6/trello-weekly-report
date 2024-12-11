@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://trello.com">
+    <script src="https://p.trellocdn.com/power-up.min.js" allow="same-origin"></script>
     <style>
         .error-message {
             color: red;
@@ -18,7 +20,6 @@
 <body>
     <div id="status-message"></div>
     
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
         function showMessage(message, isError = false) {
             const statusDiv = document.getElementById('status-message');
