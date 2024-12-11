@@ -11,7 +11,7 @@ function debug(...args) {
 const t = window.TrelloPowerUp.iframe();
 
 // Initialize API credentials
-let TRELLO_API_KEY = 'Ya8ca9d3c762c754cff0654ff37cce663'; // Get this from https://trello.com/app-key
+let TRELLO_API_KEY = 'a8ca9d3c762c754cff0654ff37cce663'; // Get this from https://trello.com/app-key
 let TRELLO_TOKEN;
 
 // Authorize with Trello
@@ -116,6 +116,9 @@ async function authorize() {
     let token = await t.arg('token');
     
     if (!token) {
+      // Create a signed return URL
+      const returnUrl = await t.signUrl('https://dmitchell6.github.io/trello-weekly-report/auth-success.html');
+      
       // Request new token if none exists
       token = await t.authorize({
         type: 'popup',
@@ -126,7 +129,7 @@ async function authorize() {
           account: true
         },
         expiration: 'never',
-        return_url: 'https://dmitchell6.github.io/trello-weekly-report/auth-success.html'
+        return_url: returnUrl  // Use the signed URL here
       });
       
       // Store token for future use
