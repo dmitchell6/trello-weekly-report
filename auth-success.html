@@ -2,17 +2,74 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <style>
+        .error-message {
+            color: red;
+            padding: 20px;
+            text-align: center;
+        }
+        .success-message {
+            color: green;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+    <div id="status-message"></div>
+    
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        var token = window.location.hash.substring(7);
-        var t = window.TrelloPowerUp.iframe();
-        
-        t.arg('token', token)
-            .then(function() {
-                t.closePopup();
-            });
+        function showMessage(message, isError = false) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.className = isError ? 'error-message' : 'success-message';
+            statusDiv.textContent = message;
+        }
+
+        try {
+            // Get token from URL hash
+            const token = window.location.hash.substring(7);
+            
+            // Validate token exists and has expected format
+            if (!token) {
+                throw new Error('No token received from Trello');
+            }
+
+            if (token.length < 32) {
+                throw new Error('Invalid token format');
+            }
+
+            const t = window.TrelloPowerUp.iframe();
+
+            // Store token and close popup
+            t.arg('token', token)
+                .then(function() {
+                    showMessage('Authorization successful! Closing window...');
+                    // Give user time to see success message
+                    setTimeout(() => {
+                        t.closePopup();
+                    }, 1000);
+                })
+                .catch(function(error) {
+                    throw new Error('Failed to store token: ' + error.message);
+                });
+
+            // Log success (remove in production)
+            console.log('Token received and validated');
+            
+        } catch (error) {
+            console.error('Authorization error:', error);
+            showMessage('Authorization failed: ' + error.message, true);
+            
+            // Attempt to close after error display
+            setTimeout(() => {
+                try {
+                    window.TrelloPowerUp.iframe().closePopup();
+                } catch (e) {
+                    console.error('Failed to close popup:', e);
+                }
+            }, 3000);
+        }
     </script>
 </body>
 </html> 
