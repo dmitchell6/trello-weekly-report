@@ -5,23 +5,26 @@
       {
         "text": "Weekly Report",
         "icon": {
-          "dark": "/images/icon-dark.svg",
-          "light": "/images/icon-light.svg"
+          "dark": "https://dmitchell6.github.io/trello-weekly-report/images/icon-dark.svg",
+          "light": "https://dmitchell6.github.io/trello-weekly-report/images/icon-light.svg"
         },
         "callback": "boardButtonCallback"
       }
     ],
     "authorization-status": {
-      "url": "./auth-status.html"
+      "url": "https://dmitchell6.github.io/trello-weekly-report/auth-status.html"
     }
   },
   "connectors": {},
   "iframe": {
-    "url": "https://YOUR-DOMAIN/index.html",
+    "url": "http://localhost:8000/frontend/index.html",
     "displayName": "Weekly Report",
-    "icon": "https://YOUR-DOMAIN/icon.png",
+    "icon": "https://dmitchell6.github.io/trello-weekly-report/icon.png",
     "allowedDomains": [
-      "https://YOUR-DOMAIN"
+      "https://dmitchell6.github.io",
+      "http://localhost:8000",
+      "https://trello.com",
+      "https://api.trello.com"
     ]
   },
   "authorization": {
@@ -29,5 +32,13 @@
       "enabled": true
     }
   },
-  "name": "Weekly Report Power-Up"
+  "name": "Weekly Report Power-Up",
+  "cors": {
+    "enabled": true,
+    "origins": [
+      "http://localhost:8000",
+      "https://trello.com",
+      "https://api.trello.com"
+    ]
+  }
 }

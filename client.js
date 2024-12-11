@@ -1,5 +1,13 @@
 /* globals window, TrelloPowerUp, fetch */
 
+const DEBUG = true;
+
+function debug(...args) {
+  if (DEBUG) {
+    console.log('[Weekly Report Debug]:', ...args);
+  }
+}
+
 const t = window.TrelloPowerUp.iframe();
 
 // Initialize API credentials
@@ -60,27 +68,38 @@ window.TrelloPowerUp.Promise.all = async function(...args) {
   return result;
 };
 
+// Add this near the top of your file
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+};
+
 // Single definition of trelloGet function
 async function trelloGet(endpoint) {
   console.log('Making API request to:', endpoint);
   await rateLimiter.throttle();
   try {
-    // Get token dynamically
     const token = await authorize();
     if (!token) {
       throw new Error('Failed to get authorization token');
     }
     
-    const url = `https://api.trello.com/1/${endpoint}?token=${token}`;
-    console.log('Full URL:', url);
-    const response = await fetch(url);
+    const url = `https://api.trello.com/1/${endpoint}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        ...corsHeaders,
+        'Authorization': `OAuth oauth_consumer_key="${TRELLO_API_KEY}", oauth_token="${token}"`,
+      },
+      credentials: 'include'
+    });
+    
     if (!response.ok) {
-      console.error('API error:', response.statusText);
       throw new Error(`Trello API error: ${response.statusText}`);
     }
-    const data = await response.json();
-    console.log('API response:', data);
-    return data;
+    
+    return await response.json();
   } catch (error) {
     console.error('API request failed:', error);
     throw error;
@@ -130,13 +149,11 @@ async function generateReport() {
     console.log('Fetching tasks between:', startDate, 'and', endDate);
     
     // Get the current board ID from Trello context
-    const context = await t.getContext();
-    const boardId = context.board;
-    
+    const boardId = await t.board('id');
+    const lists = await t.lists('all');
+    const cards = await t.cards('all');
+
     // Get lists from the board
-    const lists = await trelloGet(`boards/${boardId}/lists?cards=none`);
-    console.log('Lists:', lists);
-    
     const doneList = lists.find(l => l.name.toLowerCase() === 'done');
     const doingList = lists.find(l => l.name.toLowerCase() === 'doing');
 
@@ -296,4 +313,31 @@ function showError(message) {
 
 function showLoading(show) {
   document.querySelector('.loading-spinner').style.display = show ? 'block' : 'none';
+}
+
+window.TrelloPowerUp.initialize({
+    'board-buttons': function(t, options) {
+      return [{
+        icon: {
+          dark: '/images/icon-dark.svg',
+          light: '/images/icon-light.svg'
+        },
+        text: 'Weekly Report',
+        callback: function(t) {
+          return t.modal({
+            url: './index.html',
+            title: 'Weekly Report',
+            height: 600
+          });
+        }
+      }];
+    }
+  });
+
+if (DEBUG) {
+  window.TrelloPowerUp.iframe({
+    show: function() {
+      debug('Power-Up iframe shown');
+    }
+  });
 }
