@@ -11,7 +11,7 @@ function debug(...args) {
 const t = window.TrelloPowerUp.iframe();
 
 // Initialize API credentials
-let TRELLO_API_KEY;
+let TRELLO_API_KEY = 'Ya8ca9d3c762c754cff0654ff37cce663'; // Get this from https://trello.com/app-key
 let TRELLO_TOKEN;
 
 // Authorize with Trello
@@ -117,14 +117,20 @@ async function authorize() {
     
     if (!token) {
       // Request new token if none exists
-      token = await t.authorize('https://trello.com', {
-        scope: 'read,account',
+      token = await t.authorize({
+        type: 'popup',
+        name: 'Weekly Report Power-Up',
+        scope: {
+          read: true,
+          write: true,
+          account: true
+        },
         expiration: 'never',
-        name: 'Weekly Report Power-Up'
+        return_url: 'https://dmitchell6.github.io/trello-weekly-report/auth-success.html'
       });
       
       // Store token for future use
-      await t.arg('token', token);
+      await t.set('member', 'private', 'token', token);
     }
     
     return token;
