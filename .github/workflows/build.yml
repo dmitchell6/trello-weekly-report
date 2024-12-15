@@ -1,0 +1,15 @@
+name: Build and Deploy
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install and Build
+        env:
+          TRELLO_SECRET: ${{ secrets.TRELLO_SECRET }}
+        run: |
+          npm install
+          echo "window.TrelloConfig.secret='$TRELLO_SECRET';" >> public/config.js 
