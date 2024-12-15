@@ -22,7 +22,7 @@ app.use(express.static('public'));
 
 // Basic routing
 app.get("*", function (request, response) {
-  response.sendFile(path.join(__dirname, 'views/index.html'));
+  response.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Add this before the basic routing
