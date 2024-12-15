@@ -15,6 +15,7 @@
   },
   "origins": [
     "https://dmitchell6.github.io",
+    "https://dmitchell6.github.io/trello-weekly-report/public/",
     "https://localhost:8000",
     "https://trello.com"
   ]
