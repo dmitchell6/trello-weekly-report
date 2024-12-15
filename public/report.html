@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Weekly Report</title>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <style>
+    .report-container {
+      padding: 1rem;
+    }
+    .date-range {
+      margin-bottom: 1rem;
+    }
+    .date-input {
+      margin: 0.5rem;
+    }
+    #report-content {
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <div class="date-range">
+      <div class="date-input">
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date">
+      </div>
+      <div class="date-input">
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date">
+      </div>
+    </div>
+    <button class="mod-primary" id="generate-report">Generate Report</button>
+    <div id="report-content"></div>
+  </div>
+  
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="./js/report.js"></script>
+</body>
+</html> 

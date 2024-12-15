@@ -1,0 +1,19 @@
+{
+  "name": "Weekly Report",
+  "details": "Generate weekly reports from Trello boards",
+  "icon": {
+    "url": "https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket-ship.png?1494946700421"
+  },
+  "author": "Your Name",
+  "capabilities": [
+    "board-buttons"
+  ],
+  "connectors": {
+    "iframe": {
+      "url": "./index.html"
+    }
+  },
+  "origins": [
+    "https://localhost:8000"
+  ]
+} 
