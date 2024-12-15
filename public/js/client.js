@@ -17,7 +17,7 @@ TrelloPowerUp.initialize({
       callback: function(t) {
         return t.modal({
           title: 'Weekly Report',
-          url: './report.html',
+          url: t.signUrl('./report.html'),
           height: 500
         });
       }

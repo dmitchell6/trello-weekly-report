@@ -1,6 +1,8 @@
 /* global TrelloPowerUp */
 
-var t = TrelloPowerUp.iframe();
+var t = TrelloPowerUp.iframe({
+  secret: window.TrelloConfig.apiKey
+});
 
 // Initialize date inputs with current week
 window.addEventListener('load', function() {
