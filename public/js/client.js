@@ -4,7 +4,7 @@ var Promise = TrelloPowerUp.Promise;
 
 var BLACK_ROCKET_ICON = 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket-ship.png?1494946700421';
 
-TrelloPowerUp.initialize({
+window.TrelloPowerUp.initialize({
   'board-buttons': function(t, options) {
     return [{
       icon: {
@@ -22,7 +22,7 @@ TrelloPowerUp.initialize({
     }];
   }
 }, {
-  appKey: window.TrelloConfig.apiKey,
+  appKey: TrelloConfig.apiKey,
   appName: 'Weekly Report III',
   appAuthor: 'Demarcus Mitchell'
 });
