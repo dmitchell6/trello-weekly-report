@@ -7,10 +7,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
       - name: Install and Build
         env:
           TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
           TRELLO_SECRET: ${{ secrets.TRELLO_SECRET }}
         run: |
           npm install
-          echo "window.TrelloConfig = { apiKey: '${{ secrets.TRELLO_API_KEY }}', secret: '${{ secrets.TRELLO_SECRET }}' };" > public/js/config.js
+          echo "window.TrelloConfig = { apiKey: '${{ secrets.TRELLO_API_KEY }}' };" > public/js/config.js
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages  # The branch the action should deploy to
+          folder: public    # The folder the action should deploy
+          clean: true      # Automatically remove deleted files from the deployment
+          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub automatically provides this secret
+
+      - name: Setup Node.js for deployment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Deploy Server
+        env:
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+        run: |
+          # Add any server deployment steps here
+          # For example, if deploying to Heroku:
+          # git push heroku main
