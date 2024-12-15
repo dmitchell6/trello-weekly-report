@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install and Build
         env:
-          TRELLO_SECRET: ${{ secrets.TRELLO_SECRET }}
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
         run: |
           npm install
-          echo "window.TrelloConfig.secret='$TRELLO_SECRET';" >> public/config.js 
+          echo "window.TrelloConfig = { apiKey: '$TRELLO_API_KEY' };" > public/config.js
