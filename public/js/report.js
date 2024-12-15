@@ -1,7 +1,9 @@
 /* global TrelloPowerUp */
 
 var t = TrelloPowerUp.iframe({
-  appKey: window.TrelloConfig.apiKey
+  appKey: window.TrelloConfig.apiKey,
+  appName: 'Weekly Report III',
+  secret: window.TrelloConfig.secret
 });
 
 // Initialize date inputs with current week

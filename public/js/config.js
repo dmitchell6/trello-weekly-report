@@ -1,4 +1,4 @@
 window.TrelloConfig = {
   apiKey: '455352533cbfc5442f05d95335c7a05a',
-  secret: process.env.REACT_APP_TRELLO_SECRET // This will be replaced by GitHub Actions
+  secret: '22721c0dd7db9af2434842360370c6bfde4ec635faea34d4c9e83c94a3eaf46f'
 }; 
