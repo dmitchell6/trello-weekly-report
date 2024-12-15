@@ -2,8 +2,7 @@
 
 var t = TrelloPowerUp.iframe({
   appKey: window.TrelloConfig.apiKey,
-  appName: 'Weekly Report III',
-  secret: window.TrelloConfig.secret
+  appName: 'Weekly Report III'
 });
 
 // Initialize date inputs with current week
@@ -26,17 +25,19 @@ function formatDate(date) {
 document.getElementById('generate-report').addEventListener('click', async function() {
   const startDate = new Date(document.getElementById('start-date').value);
   const endDate = new Date(document.getElementById('end-date').value);
-  
+  const boardId = await t.board('id');
+
   try {
-    // Get all lists on the board
-    const lists = await t.board('all');
+    // Fetch lists from your server
+    const response = await fetch(`/api/get-lists?boardId=${boardId}`);
+    const lists = await response.json();
     const doneList = lists.find(list => list.name === 'Done');
     
     if (!doneList) {
       throw new Error('No "Done" list found');
     }
     
-    // Get cards in the Done list
+    // Fetch cards from Trello using your server or client-side Trello API
     const cards = await t.cards('all');
     const completedCards = cards.filter(card => {
       const movedDate = new Date(card.dateLastActivity);

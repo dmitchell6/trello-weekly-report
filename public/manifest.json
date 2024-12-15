@@ -14,6 +14,7 @@
     }
   },
   "origins": [
-    "https://dmitchell6.github.io"
+    "https://dmitchell6.github.io",
+    "https://localhost:8000"
   ]
 } 

@@ -10,6 +10,7 @@ jobs:
       - name: Install and Build
         env:
           TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+          TRELLO_SECRET: ${{ secrets.TRELLO_SECRET }}
         run: |
           npm install
-          echo "const TRELLO_API_KEY = '${{ secrets.TRELLO_API_KEY }}';" > public/config.js
+          echo "window.TrelloConfig = { apiKey: '${{ secrets.TRELLO_API_KEY }}', secret: '${{ secrets.TRELLO_SECRET }}' };" > public/js/config.js
