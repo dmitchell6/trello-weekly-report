@@ -2,11 +2,17 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
+
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       
       - name: Install and Build
         env:
@@ -19,10 +25,10 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
-          branch: gh-pages  # The branch the action should deploy to
-          folder: public    # The folder the action should deploy
-          clean: true      # Automatically remove deleted files from the deployment
-          token: ${{ secrets.GITHUB_TOKEN }}  # GitHub automatically provides this secret
+          branch: gh-pages
+          folder: public
+          clean: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v2
