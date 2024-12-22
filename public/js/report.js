@@ -23,34 +23,58 @@ function formatDate(date) {
 }
 
 document.getElementById('generate-report').addEventListener('click', async function() {
-  const startDate = new Date(document.getElementById('start-date').value);
-  const endDate = new Date(document.getElementById('end-date').value);
-  const boardId = await t.board('id');
-
   try {
-    // Fetch lists from your server
-    const response = await fetch(`/api/get-lists?boardId=${boardId}`);
-    const lists = await response.json();
-    const doneList = lists.find(list => list.name === 'Done');
+    // Show loading state
+    const reportContent = document.getElementById('report-content');
+    reportContent.innerHTML = '<div class="loading">Generating report...</div>';
+
+    const startDate = new Date(document.getElementById('start-date').value);
+    const endDate = new Date(document.getElementById('end-date').value);
     
-    if (!doneList) {
-      throw new Error('No "Done" list found');
+    // Validate dates
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error('Please select valid dates');
     }
+    if (startDate > endDate) {
+      throw new Error('Start date must be before end date');
+    }
+
+    // Get board ID from Trello iframe
+    const t = TrelloPowerUp.iframe();
+    const board = await t.board('id');
     
-    // Fetch cards from Trello using your server or client-side Trello API
-    const cards = await t.cards('all');
+    // Fetch data from secure server endpoints
+    const [listsResponse, cardsResponse] = await Promise.all([
+      fetch(`/api/lists?boardId=${board.id}`),
+      fetch(`/api/cards?boardId=${board.id}`)
+    ]);
+
+    if (!listsResponse.ok || !cardsResponse.ok) {
+      throw new Error('Failed to fetch data from server');
+    }
+
+    const lists = await listsResponse.json();
+    const cards = await cardsResponse.json();
+
+    const doneList = lists.find(list => list.name.toLowerCase() === 'done');
+    if (!doneList) {
+      throw new Error('No "Done" list found on this board');
+    }
+
+    // Filter completed cards
     const completedCards = cards.filter(card => {
       const movedDate = new Date(card.dateLastActivity);
       return card.idList === doneList.id && 
              movedDate >= startDate && 
              movedDate <= endDate;
     });
-    
-    displayReport(completedCards);
+
+    await displayReport(completedCards);
+
   } catch (error) {
     console.error('Error generating report:', error);
     document.getElementById('report-content').innerHTML = 
-      `<div class="error">Error generating report: ${error.message}</div>`;
+      `<div class="error">Error: ${error.message}</div>`;
   }
 });
 
