@@ -35,11 +35,19 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Deploy Server
-        env:
-          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
-          TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      - name: Deploy Server to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "trello-weekly-report"
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+
+      - name: Update Config
         run: |
-          # Add any server deployment steps here
-          # For example, if deploying to Heroku:
-          # git push heroku main
+          echo "window.TrelloConfig = { 
+            apiKey: '${{ secrets.TRELLO_API_KEY }}',
+            apiUrl: '${{ secrets.API_URL }}'
+          };" > public/js/config.js
+
+env:
+  API_URL: https://trello-weekly-report.herokuapp.com
