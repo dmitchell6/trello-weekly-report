@@ -44,9 +44,10 @@ document.getElementById('generate-report').addEventListener('click', async funct
     const board = await t.board('id');
     
     // Fetch data from secure server endpoints
+    const API_BASE_URL = window.TrelloConfig.apiUrl;
     const [listsResponse, cardsResponse] = await Promise.all([
-      fetch(`/api/lists?boardId=${board.id}`),
-      fetch(`/api/cards?boardId=${board.id}`)
+      fetch(`${API_BASE_URL}/api/lists?boardId=${board.id}`),
+      fetch(`${API_BASE_URL}/api/cards?boardId=${board.id}`)
     ]);
 
     if (!listsResponse.ok || !cardsResponse.ok) {
