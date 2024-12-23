@@ -40,7 +40,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Serve static files from the 'public' directory
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.get('/api/lists', async (req, res) => {
@@ -88,7 +88,7 @@ async function setupServer() {
   
   if (process.env.NODE_ENV === 'production') {
     // In production (Heroku), use regular HTTP since Heroku handles SSL/TLS
-    server = express();
+    server = app;
   } else {
     // Development only - use HTTPS
     const devCerts = require('./config/development-certs');
