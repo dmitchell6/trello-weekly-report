@@ -42,7 +42,7 @@ app.use(cors(corsOptions));
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-// First, define your API routes
+// API Routes
 app.get('/api/lists', async (req, res) => {
   const boardId = req.query.boardId;
   try {
@@ -77,26 +77,34 @@ app.get('/api/cards', async (req, res) => {
   }
 });
 
-// Then, at the end, add your catch-all route
+// Catch-all Route
 app.get("*", function (request, response) {
   response.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// HTTPS configuration
-let server;
-if (process.env.NODE_ENV === 'production') {
-  // In production, use proper certificate management service
-  const certManager = require('./utils/certManager');
-  const { key, cert } = await certManager.getCertificates();
-  server = https.createServer({ key, cert }, app);
-} else {
-  // Development only
-  const devCerts = require('./config/development-certs');
-  server = https.createServer(devCerts, app);
+// HTTPS Configuration
+async function setupServer() {
+  let server;
+  
+  if (process.env.NODE_ENV === 'production') {
+    // In production, use proper certificate management service
+    const certManager = require('./utils/certManager');
+    const { key, cert } = await certManager.getCertificates();
+    server = https.createServer({ key, cert }, app);
+  } else {
+    // Development only
+    const devCerts = require('./config/development-certs');
+    server = https.createServer(devCerts, app);
+  }
+
+  const PORT = process.env.PORT || 8000;
+  server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 }
 
-// Create HTTPS server
-const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Start Server
+setupServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
