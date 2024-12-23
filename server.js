@@ -87,12 +87,10 @@ async function setupServer() {
   let server;
   
   if (process.env.NODE_ENV === 'production') {
-    // In production, use proper certificate management service
-    const certManager = require('./utils/certManager');
-    const { key, cert } = await certManager.getCertificates();
-    server = https.createServer({ key, cert }, app);
+    // In production (Heroku), use regular HTTP since Heroku handles SSL/TLS
+    server = express();
   } else {
-    // Development only
+    // Development only - use HTTPS
     const devCerts = require('./config/development-certs');
     server = https.createServer(devCerts, app);
   }
